@@ -15,6 +15,26 @@ const commands = [
                 name: "exclude-color",
                 description: 'Exclude a color from query',
                 type: ApplicationCommandOptionType.String
+            },
+            {
+                name: "activated-abilities",
+                description: 'Exclude/Include cards with activated abilites',
+                type: ApplicationCommandOptionType.Boolean
+            },
+            {
+                name: "triggered-abilities",
+                description: 'Exclude/Include cards with triggered abilites',
+                type: ApplicationCommandOptionType.Boolean
+            },
+            {
+                name: "oracle-text",
+                description: 'Text included somewhere on the card',
+                type: ApplicationCommandOptionType.String
+            },
+            {
+                name: "oracle-tags",
+                description: 'Tags',
+                type: ApplicationCommandOptionType.String
             }
         ]
     }

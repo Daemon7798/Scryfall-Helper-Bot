@@ -1,5 +1,6 @@
 require('dotenv').config();
-const { Client, IntentsBitField } = require('discord.js');
+const fetch = require('node-fetch');
+const { Client, IntentsBitField, } = require('discord.js');
 
 const client = new Client({
     intents: [
@@ -229,8 +230,24 @@ client.on("interactionCreate", (inter) =>
             }
         }
 
+        apiQuery();
+
         inter.reply(`${query}`);
     }
 });
+
+async function apiQuery()
+{
+    const response = await fetch("https://api.scryfall.com/cards/named?fuzzy=aust+com", {
+        method: "GET",
+        url: "https://api.scryfall.com/cards/named?fuzzy=aust+com ",
+        headers: { "Accept": "*/*", "User-Agent": "Scryfall-Helper/1.0 Discord" },
+    });
+
+    const data = await response.json();
+
+    console.log(`Here is the api call output`);
+    console.log(data);
+}
 
 client.login(process.env.TOKEN);
