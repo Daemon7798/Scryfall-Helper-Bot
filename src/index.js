@@ -13,7 +13,7 @@ const client = new Client({
 
 client.on("clientReady", (c) =>
 {
-    console.log(`👀 ${c.user.username} online`);
+    console.log(`${c.user.username} online`);
 });
 
 client.on("interactionCreate", (inter) =>
@@ -22,9 +22,20 @@ client.on("interactionCreate", (inter) =>
 
     if (inter.commandName === 'query')
     {
-        let query = '';
+        let query = 'game:paper ';
+        const sText = inter.options.get('search-text');
         const id = inter.options.get('color-id');
         const colorExclude = inter.options.get('exclude-color');
+        const cardType = inter.options.get('card-type');
+        const activated = inter.options.get('activated-abilities');
+        const triggered = inter.options.get('triggered-abilities');
+        const oracle = inter.options.get('oracle-text');
+        const tags = inter.options.get('oracle-tags');
+
+        if (sText)
+        {
+            query += sText.value + " ";
+        }
 
         if (id)
         {
@@ -198,39 +209,120 @@ client.on("interactionCreate", (inter) =>
 
         if (colorExclude)
         {
-            switch (colorExclude.value.toLowerCase())
+            const colors = colorExclude.value.split(";");
+            for (let i = 0; i < colors.length; i++)
             {
-                case 'r':
-                case 'red':
-                    query += "-c:r ";
-                    break;
-                case 'b':
-                case 'black':
-                    query += "-c:b ";
-                    break;
-                case 'g':
-                case 'green':
-                    query += "-c:g ";
-                    break;
-                case 'w':
-                case 'white':
-                    query += "-c:w ";
-                    break;
-                case ' u':
-                case 'blue':
-                    query += "-c:u ";
-                    break;
-                case 'c':
-                case 'colorless':
-                    query += "-c:c ";
-                    break;
-                default:
-                    inter.reply('Error processing color exclusion, please contact Daemon');
-                    return;
+                switch (colors[i].toLowerCase().trim())
+                {
+                    case 'r':
+                    case 'red':
+                        query += "-c:r ";
+                        break;
+                    case 'b':
+                    case 'black':
+                        query += "-c:b ";
+                        break;
+                    case 'g':
+                    case 'green':
+                        query += "-c:g ";
+                        break;
+                    case 'w':
+                    case 'white':
+                        query += "-c:w ";
+                        break;
+                    case 'u':
+                    case 'blue':
+                        query += "-c:u ";
+                        break;
+                    case 'c':
+                    case 'colorless':
+                        query += "-c:c ";
+                        break;
+                    default:
+                        inter.reply('Error processing color exclusion, please contact Daemon');
+                        return;
+                }
             }
         }
 
-        apiQuery();
+        if (cardType)
+        {
+            const types = cardType.value.split(";");
+            for (let i = 0; i < types.length; i++)
+            {
+                if (types[i][0] !== "-")
+                {
+                    query += "t:" + types[i] + " ";
+                }
+
+                else
+                {
+                    query += "-t:" + types[i].substring(1) + " ";
+                }
+            }
+        }
+
+        if (!activated)
+        {
+            query += "-o:':' ";
+        }
+
+        if (!triggered)
+        {
+            query += "-o:whenever -o:when -o:'at the beginning' -o:'at the end' ";
+        }
+
+        if (oracle)
+        {
+            const oParameters = oracle.value.split(";");
+            for (let i = 0; i < oParameters.length; i++)
+            {
+                if (oParameters[i].indexOf(" ") < 0)
+                {
+                    if (oParameters[i][0] !== "-")
+                    {
+                        query += "o:" + oParameters[i].trim() + " ";
+                    }
+
+                    else
+                    {
+                        query += "-o:" + oParameters[i].substring(1).trim() + " ";
+                    }
+                }
+
+                else
+                {
+                    if (oParameters[i][0] !== "-")
+                    {
+                        query += "o:'" + oParameters[i].trim() + "' ";
+                    }
+
+                    else
+                    {
+                        query += "-o:'" + oParameters[i].substring(1).trim() + "' ";
+                    }
+                }
+            }
+        }
+
+        if (tags)
+        {
+            const tParameters = tags.value.split(";");
+            for (let i = 0; i < tParameters.length; i++)
+            {
+                if (tParameters[i][0] !== "-")
+                {
+                    query += "otag:" + tParameters[i].trim() + " ";
+                }
+
+                else
+                {
+                    query += "-otag:" + tParameters[i].trim() + " ";
+                }
+            }
+        }
+
+        //apiQuery();
 
         inter.reply(`${query}`);
     }

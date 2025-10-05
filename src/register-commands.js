@@ -7,33 +7,43 @@ const commands = [
         description: 'Format a scryfall query',
         options: [
             {
+                name: 'search-text',
+                description: 'Search text',
+                type: ApplicationCommandOptionType.String,
+            },
+            {
                 name: 'color-id',
                 description: 'Inclusive color id of cards',
                 type: ApplicationCommandOptionType.String,
             },
             {
                 name: "exclude-color",
-                description: 'Exclude a color from query',
+                description: 'Exclude a color from query. Semicolons to separate multiple parameters',
+                type: ApplicationCommandOptionType.String
+            },
+            {
+                name: "card-type",
+                description: 'Only return specific card type(s). Semicolons to separate multiple parameters, - for negation',
                 type: ApplicationCommandOptionType.String
             },
             {
                 name: "activated-abilities",
-                description: 'Exclude/Include cards with activated abilites',
+                description: 'Exclude cards with activated abilites',
                 type: ApplicationCommandOptionType.Boolean
             },
             {
                 name: "triggered-abilities",
-                description: 'Exclude/Include cards with triggered abilites',
+                description: 'Exclude cards with triggered abilites',
                 type: ApplicationCommandOptionType.Boolean
             },
             {
                 name: "oracle-text",
-                description: 'Text included somewhere on the card',
+                description: 'Text included somewhere on the card. Semicolons to separate multiple parameters, - for negation',
                 type: ApplicationCommandOptionType.String
             },
             {
                 name: "oracle-tags",
-                description: 'Tags',
+                description: 'Tags associated with card function. Semicolons to separate multiple parameters, - for negation',
                 type: ApplicationCommandOptionType.String
             }
         ]
