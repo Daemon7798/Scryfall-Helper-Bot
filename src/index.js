@@ -1,6 +1,6 @@
 require('dotenv').config();
 const fetch = require('node-fetch');
-const { Client, IntentsBitField, } = require('discord.js');
+const { Client, IntentsBitField, EmbedBuilder } = require('discord.js');
 
 const client = new Client({
     intents: [
@@ -23,6 +23,7 @@ client.on("interactionCreate", (inter) =>
     if (inter.commandName === 'query')
     {
         let query = 'game:paper ';
+        let fields = '';
         const sText = inter.options.get('search-text');
         const id = inter.options.get('color-id');
         const colorExclude = inter.options.get('exclude-color');
@@ -34,11 +35,13 @@ client.on("interactionCreate", (inter) =>
 
         if (sText)
         {
+            fields += "Search-Text ";
             query += sText.value + " ";
         }
 
         if (id)
         {
+            fields += "Color-ID ";
             switch (id.value.toLowerCase().replaceAll("/", " ").replaceAll(", ", " ").replaceAll(",", " ").trim())
             {
                 case 'r':
@@ -209,6 +212,7 @@ client.on("interactionCreate", (inter) =>
 
         if (colorExclude)
         {
+            fields += "Color-Exclusion(s) ";
             const colors = colorExclude.value.split(";");
             for (let i = 0; i < colors.length; i++)
             {
@@ -247,6 +251,7 @@ client.on("interactionCreate", (inter) =>
 
         if (cardType)
         {
+            fields += "Card-Type(s) ";
             const types = cardType.value.split(";");
             for (let i = 0; i < types.length; i++)
             {
@@ -262,18 +267,27 @@ client.on("interactionCreate", (inter) =>
             }
         }
 
-        if (!activated)
+        if (activated)
         {
-            query += "-o:':' ";
+            fields += "Activated-Abilities ";
+            if (activated.value === false)
+            {
+                query += "-o:':' ";
+            }
         }
 
-        if (!triggered)
+        if (triggered)
         {
-            query += "-o:whenever -o:when -o:'at the beginning' -o:'at the end' ";
+            fields += "Triggered-Abilities ";
+            if (triggered.value === false)
+            {
+                query += "-o:whenever -o:when -o:'at the beginning' -o:'at the end' ";
+            }
         }
 
         if (oracle)
         {
+            fields += "Oracle-Text ";
             const oParameters = oracle.value.split(";");
             for (let i = 0; i < oParameters.length; i++)
             {
@@ -307,6 +321,7 @@ client.on("interactionCreate", (inter) =>
 
         if (tags)
         {
+            fields += "Card-Tag(s)";
             const tParameters = tags.value.split(";");
             for (let i = 0; i < tParameters.length; i++)
             {
@@ -323,9 +338,51 @@ client.on("interactionCreate", (inter) =>
         }
 
         //apiQuery();
+        /* const paramNames = fields.split(" ");
+        const params = query.split(" ");
+        console.log(paramNames);
+        console.log(params);
+        const fieldObjs = [];
+        for (let u = 0; u < paramNames.length; u++) 
+        {
+            fieldObjs.push(
+                {
+                    name: paramNames[u].trim().replaceAll("-", " "),
+                    value: params[u],
+                    inline: u !== 0 && u % 4 === 0 ? false : true
+                }
+            );
+        } 
 
-        inter.reply(`${query}`);
+        console.log(fieldObjs);*/
+
+        const embed = new EmbedBuilder()
+            .setTitle("Scryfall Search Results")
+            .setDescription("Search parameters: " + query)
+            .setColor(0x431e3f)
+            .setImage('https://cdn.discordapp.com/app-icons/1411002337580810262/2d245406bd3e453ac220fcd5cd45777e.png?size=1024');
+
+        inter.reply({ embeds: [embed] });
     }
+
+
+});
+
+client.on("messageCreate", (msg) =>
+{
+    if (msg.channel.id === "1411020442348683326")
+    {
+        const msgClean = msg.content.trim().toLowerCase();
+        if (msgClean.indexOf('cock') >= 0)
+        {
+            const cockSignalEmbed = new EmbedBuilder().setImage("attachment://CockSignal.jpg").setDescription('<@269985155798663172>');
+            msg.reply({ embeds: [cockSignalEmbed], files: ['./src/CockSignal.jpg'] });
+        }
+
+    }
+
+    else return;
+
 });
 
 async function apiQuery()
